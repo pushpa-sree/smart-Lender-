@@ -34,7 +34,7 @@ def predict():
 
     prediction = model.predict(final_input)
 
-    result = "Congratulations Loan Approved." if prediction[0] == 1 else "Loan Rejected"
+    result = "Congratulations Loan Approved." if prediction[0] == 1 else "Sorry !! Loan Rejected"
 
     return render_template("index.html", prediction_text=result)
 
