@@ -16,7 +16,6 @@ import joblib
 
 app = Flask(__name__)
 
-
 # ============================================================
 # Load Trained Model and Feature Names
 # ============================================================
@@ -32,14 +31,27 @@ def load_model():
         return trained_model
 
     except FileNotFoundError:
-        print("Model file not found.")
+        print("Error: Model file not found.")
+        return None
+
+
+def load_feature_names():
+    """
+    Load feature names used during model training.
+    """
+
+    try:
+        feature_columns = joblib.load("models/feature_names.pkl")
+        print("Feature names loaded successfully.")
+        return feature_columns
+
+    except FileNotFoundError:
+        print("Error: Feature names file not found.")
         return None
 
 
 loan_prediction_model = load_model()
-
-feature_names = joblib.load("models/feature_names.pkl")
-
+feature_names = load_feature_names()
 
 # ============================================================
 # Home Page
@@ -48,7 +60,7 @@ feature_names = joblib.load("models/feature_names.pkl")
 @app.route("/")
 def home():
     """
-    Display home page.
+    Display the Smart Lender home page.
     """
     return render_template("index.html")
 
@@ -59,13 +71,16 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    """
+    Predict loan eligibility based on user input.
+    """
 
     try:
 
         # Read form data
         form_data = request.form
 
-        # Create DataFrame from user input
+        # Create dataframe using user input
         user_data = pd.DataFrame({
 
             "Gender": [form_data["gender"]],
@@ -101,42 +116,48 @@ def predict():
         })
 
         # Convert categorical variables into dummy variables
-        user_data = pd.get_dummies(user_data)
+        encoded_user_data = pd.get_dummies(user_data)
 
-        # Match training feature order
-        user_data = user_data.reindex(
+        # Match the exact feature order used during training
+        encoded_user_data = encoded_user_data.reindex(
             columns=feature_names,
             fill_value=0
         )
 
         # Generate prediction
-        prediction = loan_prediction_model.predict(user_data)
+        prediction = loan_prediction_model.predict(encoded_user_data)
 
-        # Convert prediction into readable text
-        if prediction[0] == 1:
-            prediction_result = "Loan Approved ✅"
-        else:
-            prediction_result = "Loan Rejected ❌"
+        # Display readable result
+        prediction_result = (
+            "✅ Loan Approved"
+            if prediction[0] == 1
+            else "❌ Loan Rejected"
+        )
 
         return render_template(
             "index.html",
             prediction_text=prediction_result
         )
 
+    except ValueError:
+
+        return render_template(
+            "index.html",
+            prediction_text="Please enter valid numeric values."
+        )
+
     except Exception as error:
 
         return render_template(
             "index.html",
-            prediction_text=f"Error: {error}"
+            prediction_text=f"Unexpected Error: {error}"
         )
 
 
 # ============================================================
-# Run Application
+# Run Flask Application
 # ============================================================
 
 if __name__ == "__main__":
 
-    app.run(
-        debug=True
-    )
+    app.run(debug=True)

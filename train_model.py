@@ -268,7 +268,18 @@ def save_model(model, feature_names):
 # Main Function
 # ============================================================
 
+# ============================================================
+# Main Function
+# ============================================================
+
+# ============================================================
+# Main Function
+# ============================================================
+
 def main():
+    """
+    Execute the complete machine learning pipeline.
+    """
 
     print("=" * 60)
     print("Smart Lender - Loan Eligibility Prediction")
@@ -279,45 +290,23 @@ def main():
         "data/train_u6lujuX_CVtuZ9i.csv"
     )
 
-    # Preprocess dataset
-    X, y = preprocess_data(
-        loan_data
-    )
-
-    # ========================================================
-    # Display Feature Information
-    # ========================================================
-
-    print("\nFeatures used for model training:\n")
-    print(X.columns.tolist())
-
-    print("\nTotal Number of Features:", len(X.columns))
+    # Preprocess data
+    X, y = preprocess_data(loan_data)
 
     # Split dataset
-    (
-        X_train,
-        X_test,
-        y_train,
-        y_test
-    ) = split_dataset(
+    X_train, X_test, y_train, y_test = split_dataset(
         X,
         y
     )
 
     # Scale features
-    (
-        X_train_scaled,
-        X_test_scaled
-    ) = scale_features(
+    X_train_scaled, X_test_scaled = scale_features(
         X_train,
         X_test
     )
 
     # Train models
-    (
-        best_model,
-        model_results
-    ) = train_models(
+    best_model, model_results = train_models(
         X_train,
         X_test,
         y_train,
@@ -326,21 +315,22 @@ def main():
         X_test_scaled
     )
 
+    # Display model performance
     print("\nModel Comparison")
     print("-" * 30)
 
     for model_name, accuracy in model_results.items():
         print(f"{model_name:<20}: {accuracy:.4f}")
 
-    # Save the best model
+    # Save best model and feature names
     save_model(
-    best_model,
-    X.columns.tolist()
-)
+        best_model,
+        X.columns.tolist()
+    )
 
 
 # ============================================================
-# Program Entry Point
+# Run Program
 # ============================================================
 
 if __name__ == "__main__":
