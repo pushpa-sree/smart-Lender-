@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request
 import joblib
 import numpy as np
+import os
 
 app = Flask(__name__)
 
 # Load model
 model = joblib.load("models/loan_model.pkl")
+
+print("Current folder:", os.getcwd())
+print("Model features:", model.n_features_in_)
 
 @app.route('/')
 def home():
@@ -31,6 +35,10 @@ def predict():
     ]
 
     final_input = np.array(input_data).reshape(1, -1)
+
+    print("Input shape:", final_input.shape)
+    print("Input:", final_input)
+    print("Model expects:", model.n_features_in_)
 
     prediction = model.predict(final_input)
 
