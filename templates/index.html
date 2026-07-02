@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body>
+<body data-prediction="{% if prediction_text %}{{ prediction_text }}{% endif %}">
 
     <!-- Animated Background Elements -->
     <div class="bg-orb orb-1"></div>
@@ -196,37 +196,120 @@
         <p>© 2026 Smart Lender | Engineered by Testing & QA Team</p>
     </footer>
 
-    <!-- Result Popup Logic -->
-    {% if prediction_text %}
+    <!-- Result & Age Verification Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const resultText = "{{ prediction_text }}";
-            let isApproved = resultText.includes("Approved");
+            // Read prediction from the body data attribute
+            const resultText = document.body.getAttribute('data-prediction');
+            
+            // 1. If prediction exists, user just submitted the form. Show prediction popup and skip age check.
+            if (resultText && resultText.trim() !== "None" && resultText.trim() !== "") {
+                let isApproved = resultText.includes("Approved");
+
+                Swal.fire({
+                    title: isApproved ? 'Congratulations!' : 'Application Rejected',
+                    text: resultText,
+                    icon: isApproved ? 'success' : 'error',
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    color: '#fff',
+                    backdrop: isApproved ? 'rgba(0,0,0,0.6) url("https://media.giphy.com/media/nVXzt7FSJlX7W/giphy.gif") center top no-repeat' : 'rgba(0,0,0,0.8)',
+                    customClass: {
+                        popup: 'glass-popup',
+                        confirmButton: 'glow-button'
+                    },
+                    showClass: {
+                        popup: 'animate__animated animate__zoomIn'
+                    },
+                    hideClass: {
+                        popup: 'animate__animated animate__zoomOut'
+                    }
+                }).then(() => {
+                    // Smooth scroll back to form
+                    document.getElementById('predict').scrollIntoView({ behavior: 'smooth' });
+                });
+                
+                return; // Stop execution here
+            }
+
+            // 2. Otherwise, this is a fresh page load. Run age verification.
+            const elementsToBlur = document.querySelectorAll('.glass-nav, .hero, .predict-section, .features-section, .glass-footer, .bg-orb');
+            elementsToBlur.forEach(el => el.classList.add('blur-content'));
 
             Swal.fire({
-                title: isApproved ? 'Congratulations!' : 'Application Rejected',
-                text: resultText,
-                icon: isApproved ? 'success' : 'error',
+                title: '🛑 SAFETY ALERT 🛑',
+                text: 'This website is strictly for individuals aged 18 and older. Please enter your age to continue.',
+                input: 'number',
+                inputAttributes: {
+                    min: 1,
+                    max: 120,
+                    step: 1
+                },
+                icon: 'warning',
                 background: 'rgba(15, 23, 42, 0.95)',
                 color: '#fff',
-                backdrop: isApproved ? 'rgba(0,0,0,0.6) url("https://media.giphy.com/media/nVXzt7FSJlX7W/giphy.gif") center top no-repeat' : 'rgba(0,0,0,0.8)',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                confirmButtonText: 'Verify Age',
                 customClass: {
                     popup: 'glass-popup',
                     confirmButton: 'glow-button'
                 },
-                showClass: {
-                    popup: 'animate__animated animate__zoomIn'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__zoomOut'
+                preConfirm: (age) => {
+                    if (!age) {
+                        Swal.showValidationMessage('Please enter your age');
+                    }
+                    return age;
                 }
-            }).then(() => {
-                // Smooth scroll back to form
-                document.getElementById('predict').scrollIntoView({ behavior: 'smooth' });
+            }).then((result) => {
+                if (result.value) {
+                    const age = parseInt(result.value);
+                    if (age < 18) {
+                        // User is underage - Red Alert!
+                        document.body.classList.add('red-alert-mode');
+                        // Hide content completely to enforce safety
+                        elementsToBlur.forEach(el => el.style.display = 'none');
+
+                        Swal.fire({
+                            title: '🚨 EMERGENCY ALERT 🚨',
+                            html: '<b>AGE VERIFICATION FAILED!</b><br><br>You must be 18+ to access loan services. Access Denied.',
+                            icon: 'error',
+                            background: '#2a0000',
+                            color: '#ff4d4d',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'glass-popup'
+                            }
+                        });
+                    } else {
+                        // User is 18+ - Welcome!
+                        document.body.classList.add('green-welcome-mode');
+                        
+                        Swal.fire({
+                            title: '✅ Access Granted',
+                            text: 'You are welcome! Verification successful.',
+                            icon: 'success',
+                            background: 'rgba(15, 23, 42, 0.95)',
+                            color: '#00ff00',
+                            timer: 2500,
+                            showConfirmButton: false,
+                            customClass: {
+                                popup: 'glass-popup'
+                            }
+                        }).then(() => {
+                            // Unblur site
+                            elementsToBlur.forEach(el => el.classList.remove('blur-content'));
+                            // Remove the green flash animation class after it's done
+                            setTimeout(() => {
+                                document.body.classList.remove('green-welcome-mode');
+                            }, 3000);
+                        });
+                    }
+                }
             });
         });
     </script>
-    {% endif %}
 
     <!-- Scroll Animations JS -->
     <script>
