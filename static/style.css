@@ -483,30 +483,3 @@ body {
     .nav-links { display: none; }
     .form-wrapper { padding: 30px 20px; }
 }
-
-/* Age Verification Safety Mode */
-.blur-content {
-    filter: blur(15px);
-    pointer-events: none;
-    user-select: none;
-}
-
-.red-alert-mode {
-    animation: flash-red 0.5s infinite;
-}
-
-.green-welcome-mode {
-    animation: flash-green 1s 3; /* flashes 3 times */
-}
-
-@keyframes flash-red {
-    0% { background-color: var(--bg-color); box-shadow: inset 0 0 0px red; }
-    50% { background-color: #3b0000; box-shadow: inset 0 0 150px red; }
-    100% { background-color: var(--bg-color); box-shadow: inset 0 0 0px red; }
-}
-
-@keyframes flash-green {
-    0% { background-color: var(--bg-color); box-shadow: inset 0 0 0px #00ff00; }
-    50% { background-color: #003b00; box-shadow: inset 0 0 150px #00ff00; }
-    100% { background-color: var(--bg-color); box-shadow: inset 0 0 0px #00ff00; }
-}
