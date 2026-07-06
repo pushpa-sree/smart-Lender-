@@ -1,345 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Lender | Create Account</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            min-height: 100vh;
-        }
-        .split-layout {
-            display: flex;
-            width: 100%;
-            min-height: 100vh;
-        }
-        .auth-side {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            background: var(--bg-color);
-            z-index: 10;
-        }
-        .graphic-side {
-            flex: 1.2;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(30, 34, 45, 1) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
-            border-left: 1px solid var(--border-color);
-        }
-        .graphic-bg-glow {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0,0,0,0) 70%);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .graphic-content {
-            position: relative;
-            z-index: 2;
-            max-width: 500px;
-            text-align: center;
-        }
-        .auth-container {
-            width: 100%;
-            max-width: 420px;
-        }
-        .auth-header {
-            margin-bottom: 30px;
-        }
-        .auth-header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        .auth-header p {
-            color: var(--text-muted);
-            font-size: 1rem;
-        }
-        
-        /* Modern Inputs with Icons */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        .input-wrapper {
-            position: relative;
-        }
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            transition: color 0.3s ease;
-        }
-        .input-wrapper input {
-            width: 100%;
-            padding: 14px 16px 14px 48px; /* Extra left padding for icon */
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .input-wrapper input:focus {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: var(--purple);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
-        }
-        .input-wrapper input:focus + .input-icon {
-            color: var(--purple);
-        }
-        .toggle-password {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0;
-            transition: color 0.2s ease;
-        }
-        .toggle-password:hover {
-            color: #fff;
-        }
-        
-        .password-hint {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 8px;
-            line-height: 1.4;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            margin-top: 10px;
-            background-color: var(--purple);
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
-            border: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-weight: 500;
-        }
-        .submit-btn:hover {
-            background-color: #7c3aed;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
-        }
-        
-        .auth-footer {
-            margin-top: 30px;
-            text-align: center;
-            color: var(--text-muted);
-        }
-        .auth-footer a {
-            color: var(--purple);
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-        .auth-footer a:hover {
-            color: #7c3aed;
-        }
-        
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 1100;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .toast {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 20px;
-            background: rgba(30, 34, 45, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            color: #fff;
-            animation: slideIn 0.3s ease forwards;
-        }
-        .toast.success { border-left: 4px solid var(--primary); }
-        .toast.error { border-left: 4px solid var(--red); }
-        .toast-icon { font-size: 1.5rem; }
-        .toast.success .toast-icon { color: var(--primary); }
-        .toast.error .toast-icon { color: var(--red); }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @media (max-width: 900px) {
-            .graphic-side { display: none; }
-        }
-    </style>
+    <title>Register | Smart Lender</title>
 </head>
 <body>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<h2>Register</h2>
 
-    <!-- Flash Messages (Toasts) -->
-    <div class="toast-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="toast {{ category }}">
-                        <i class="ph-fill {% if category == 'success' %}ph-check-circle{% else %}ph-warning-circle{% endif %} toast-icon"></i>
-                        <span>{{ message }}</span>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-    </div>
+<form method="POST">
 
-    <div class="split-layout">
-        
-        <!-- Left: Graphic Presentation -->
-        <div class="graphic-side">
-            <div class="graphic-bg-glow"></div>
-            <div class="graphic-content">
-                <div class="mockup-card" style="margin: 0 auto 40px; transform: scale(1.1); box-shadow: 0 30px 60px rgba(0,0,0,0.5);">
-                    <div class="mockup-header">
-                        <span class="mockup-title"><i class="ph-fill ph-users"></i> Join Thousands</span>
-                    </div>
-                    <div class="stat-col" style="margin-bottom: 20px;">
-                        <span class="stat-value">12,500+</span>
-                        <span class="stat-label">Applications Processed</span>
-                    </div>
-                    <div class="progress-track" style="margin-bottom: 10px;">
-                        <div class="progress-fill" style="width: 100%; background: var(--purple);"></div>
-                    </div>
-                </div>
-                <h2 style="font-size: 2.5rem; margin-bottom: 16px; color: #fff;">Start Your Journey</h2>
-                <p style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.6;">
-                    Create an account today to access AI-powered loan predictions instantly. Fast, accurate, and secure.
-                </p>
-            </div>
-        </div>
+    <input
+        type="text"
+        name="full_name"
+        placeholder="Full Name"
+        required
+    ><br><br>
 
-        <!-- Right: Auth Form -->
-        <div class="auth-side">
-            <div class="auth-container">
-                <a href="{{ url_for('home') }}" class="logo" style="margin-bottom: 40px; font-size: 1.5rem; justify-content: flex-start;">
-                    <div class="logo-icon"><i class="ph-fill ph-chart-line-up"></i></div>
-                    SmartLender
-                </a>
+    <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        required
+    ><br><br>
 
-                <div class="auth-header">
-                    <h1>Create an Account</h1>
-                    <p>Register below to get started.</p>
-                </div>
+    <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        required
+    ><br><br>
+    <br><br>
 
-                <form action="{{ url_for('register') }}" method="POST">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <div class="input-wrapper">
-                            <input type="text" name="username" placeholder="Choose a username" required autofocus>
-                            <i class="ph ph-user input-icon"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Email Address</label>
-                        <div class="input-wrapper">
-                            <input type="email" name="email" placeholder="you@example.com" required>
-                            <i class="ph ph-envelope-simple input-icon"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="input-group" style="margin-bottom: 30px;">
-                        <label>Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" name="password" id="passwordField" placeholder="Create a strong password" required>
-                            <i class="ph ph-lock-key input-icon"></i>
-                            <button type="button" class="toggle-password" onclick="togglePassword()">
-                                <i class="ph ph-eye" id="eyeIcon"></i>
-                            </button>
-                        </div>
-                        <div class="password-hint">
-                            <i class="ph-fill ph-shield-check" style="color: var(--purple);"></i> Must be at least 8 chars, containing 1 uppercase, 1 lowercase, 1 number, and 1 special char.
-                        </div>
-                    </div>
+<label>Select Role</label>
 
-                    <button type="submit" class="submit-btn">
-                        Create Account <i class="ph ph-user-plus"></i>
-                    </button>
-                </form>
+<select name="role" required>
 
-                <div class="auth-footer">
-                    Already have an account? <a href="{{ url_for('login') }}">Log in here</a>
-                </div>
-            </div>
-        </div>
-        
-    </div>
+    <option value="admin">Admin</option>
 
-    <script>
-        function togglePassword() {
-            const pwdField = document.getElementById('passwordField');
-            const eyeIcon = document.getElementById('eyeIcon');
-            
-            if (pwdField.type === 'password') {
-                pwdField.type = 'text';
-                eyeIcon.classList.replace('ph-eye', 'ph-eye-slash');
-            } else {
-                pwdField.type = 'password';
-                eyeIcon.classList.replace('ph-eye-slash', 'ph-eye');
-            }
-        }
+    <option value="officer">Credit Officer</option>
 
-        // Auto-hide toasts after 5 seconds
-        setTimeout(() => {
-            const toasts = document.querySelectorAll('.toast');
-            toasts.forEach(toast => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.4s ease';
-                setTimeout(() => toast.remove(), 400);
-            });
-        }, 5000);
-    </script>
+    <option value="analyst">Financial Analyst</option>
+
+</select>
+
+<br><br>
+    <button type="submit">
+        Register
+    </button>
+
+</form>
+
+<p>
+Already have an account?
+<a href="/login">Login</a>
+</p>
+
 </body>
 </html>
