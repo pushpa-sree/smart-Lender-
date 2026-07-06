@@ -12,6 +12,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 import joblib
+import re
+import datetime
 
 # ============================================================
 # Create Flask Application
@@ -91,6 +93,24 @@ def home():
 
 
 # ============================================================
+# Application Middleware
+# ============================================================
+
+@app.before_request
+def security_and_logging_middleware():
+    """
+    Logs incoming requests, timestamps, and IP addresses.
+    This is equivalent to a Node.js/Express middleware function.
+    """
+    # Skip logging for static files to keep the console clean
+    if request.endpoint != 'static':
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ip_addr = request.remote_addr
+        method = request.method
+        path = request.path
+        print(f"[MIDDLEWARE LOG] {timestamp} | IP: {ip_addr} | {method} {path}")
+
+# ============================================================
 # Authentication Routes
 # ============================================================
 
@@ -106,6 +126,14 @@ def register():
         
         user_exists = User.query.filter_by(username=username).first()
         email_exists = User.query.filter_by(email=email).first()
+        
+        # --- Password Strengthening (Validation) ---
+        # Rule: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+        password_pattern = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')
+        
+        if not password_pattern.match(password):
+            flash("Weak Password: Must be at least 8 chars long and contain an uppercase letter, lowercase letter, number, and special character.", "error")
+            return redirect(url_for("register"))
         
         if user_exists:
             flash("Username already exists. Please choose a different one.", "error")
