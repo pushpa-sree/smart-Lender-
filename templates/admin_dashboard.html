@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | Smart Lender{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h2>Welcome, {{ username }}</h2>
+        <p>Manage users and system settings</p>
+    </div>
+    <div>
+        <div class="badge badge-success" style="background: var(--purple-dim); color: var(--purple); padding: 5px 15px; border-radius: 20px; font-weight: 500;">
+            Role: Admin
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <a href="{{ url_for('manage_users') }}" class="dashboard-card">
+        <i class="ph ph-users" style="color: var(--blue);"></i>
+        <h3>Manage Users</h3>
+        <p>Add, remove, or modify user roles</p>
+    </a>
+
+    <a href="{{ url_for('all_predictions') }}" class="dashboard-card">
+        <i class="ph ph-chart-line-up" style="color: var(--primary);"></i>
+        <h3>All Predictions</h3>
+        <p>View complete history of all loan checks</p>
+    </a>
+
+    <a href="{{ url_for('export_csv') }}" class="dashboard-card">
+        <i class="ph ph-file-csv" style="color: var(--orange);"></i>
+        <h3>Export Data</h3>
+        <p>Download all predictions as a CSV file</p>
+    </a>
+</div>
+{% endblock %}
