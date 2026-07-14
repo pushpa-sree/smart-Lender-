@@ -100,7 +100,6 @@ smart-Lender-/
 ├── static/                       # CSS, JS, images
 │
 └── docs/
-    ├── README.md                 # This file
     ├── automated_tester.py       # Automated batch testing script
     ├── model_comparison.md       # Model accuracy comparison
     ├── architecture_diagram.md   # System architecture
@@ -213,15 +212,6 @@ This will:
 
 ---
 
-## 👥 Team
-
-| Member | Role |
-|--------|------|
-| Member 1 | Data Collection & Preprocessing |
-| Member 2 | Model Training & Evaluation |
-| Member 3 | Flask Web Application Development |
-| Member 4 | UI/UX Design & Enhancement |
-| Member 5 (You) | Testing, QA & Documentation |
 
 ---
 
